@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class UserEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(unique = true, nullable = false)
     private String username;
