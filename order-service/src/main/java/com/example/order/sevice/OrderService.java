@@ -2,12 +2,14 @@ package com.example.order.sevice;
 
 import com.example.order.dto.OrderLineItemDto;
 import com.example.order.dto.request.PlaceOrderRequest;
+import com.example.order.dto.response.InventoryResponse;
 import com.example.order.model.Order;
 import com.example.order.model.OrderLineItem;
 import com.example.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderService {
 
+    private final RestClient restClient;
     private final OrderRepository orderRepository;
 
     public void placeOrder(PlaceOrderRequest request) {
@@ -31,7 +34,22 @@ public class OrderService {
 
         order.setOrderLineItemList(orderLineItems);
 
-        orderRepository.save(order);
+        List<String> skuCodes = orderLineItems.stream().map(OrderLineItem::getSkuCode).toList();
+
+        InventoryResponse[] result = restClient
+                .get()
+                .uri("http://localhost:8082/api/inventory",
+                        uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
+                .retrieve()
+                        .body(InventoryResponse[].class);
+
+        for (InventoryResponse product : result) {
+            if (product.isInStock()) {
+                orderRepository.save(order);
+            } else {
+                throw new IllegalArgumentException("product is not in stock");
+            }
+        }
     }
 
     private OrderLineItem mapToDto(OrderLineItemDto dto) {
