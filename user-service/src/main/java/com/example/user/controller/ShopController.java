@@ -43,4 +43,10 @@ public class ShopController {
     ) {
         shopService.deleteShop(publicId, address);
     }
+
+    @GetMapping("/{address}")
+    @ResponseStatus(HttpStatus.OK)
+    public ShopResponse showInfoShop(@PathVariable String address) {
+        return shopService.showShopInfo(address);
+    }
 }

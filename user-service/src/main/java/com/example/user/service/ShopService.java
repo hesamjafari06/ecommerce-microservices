@@ -73,4 +73,11 @@ public class ShopService {
 
         shopRepository.delete(shop);
     }
+
+    public ShopResponse showShopInfo(String address) {
+        return shopMapper.entityToResponse(
+                shopRepository.findByShopAddress(address)
+                .orElseThrow(() -> new RuntimeException("shop not found"))
+        );
+    }
 }
