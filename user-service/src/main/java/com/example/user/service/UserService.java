@@ -75,7 +75,7 @@ public class UserService {
         }
     }
 
-    private UserEntity findUser(String phoneNumber, String email, String publicId) {
+    public UserEntity findUser(String phoneNumber, String email, String publicId) {
 
         if (publicId != null) {
             return userRepository.findByPublicId(publicId)
