@@ -20,6 +20,17 @@ public class UserService {
 
     @Transactional
     public UserResponse createUser(RegisterUserRequest request) {
+
+        if (userRepository.existsByPublicId(request.getPublicId())) {
+            throw new IllegalArgumentException("this publicId is occupied");
+        }
+        if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+            throw new IllegalArgumentException("this phone number is already registered");
+        }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("this email is already registered");
+        }
+
         UserEntity newUser = userMapper.registerToEntity(request);
         userRepository.save(newUser);
         return userMapper.EntityToResponse(newUser);
@@ -43,9 +54,15 @@ public class UserService {
         UserEntity user = findUser(null, null, publicId);
 
         if (request.getPublicId() != null) {
+            if (userRepository.existsByPublicId(request.getPublicId())) {
+                throw new IllegalArgumentException("this publicId is occupied");
+            }
             user.setPublicId(request.getPublicId());
         }
         if (request.getEmail() != null) {
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new IllegalArgumentException("this email is already registered");
+            }
             user.setEmail(request.getEmail());
         }
         if (request.getUsername() != null) {
