@@ -59,4 +59,18 @@ public class ShopService {
 
         return shopMapper.entityToResponse(shop);
     }
+
+
+    public void deleteShop(String publicId, String shopAddress) {
+        UserEntity owner = userService.findUser(null, null, publicId);
+
+        ShopEntity shop = shopRepository.findByShopAddress(shopAddress)
+                .orElseThrow(() -> new RuntimeException("shop not found"));
+
+        if (!shop.getOwner().equals(owner)) {
+            throw new IllegalArgumentException("this shop is now owned by you");
+        }
+
+        shopRepository.delete(shop);
+    }
 }

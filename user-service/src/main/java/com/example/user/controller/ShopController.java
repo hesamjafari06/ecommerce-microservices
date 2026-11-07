@@ -34,4 +34,13 @@ public class ShopController {
     ) {
         return shopService.updateShop(request, publicId, address);
     }
+
+    @DeleteMapping("/{address}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteShop(
+            @PathVariable String address,
+            @RequestHeader("User-Public-Id") String publicId
+    ) {
+        shopService.deleteShop(publicId, address);
+    }
 }
