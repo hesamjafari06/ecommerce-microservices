@@ -4,7 +4,11 @@ import com.example.user.model.ShopEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
     boolean existsByShopAddress(String shopAddress);
+
+    Optional<ShopEntity> findByShopAddress(String shopAddress);
 }

@@ -1,6 +1,7 @@
 package com.example.user.controller;
 
 import com.example.user.dto.request.CreateShopRequest;
+import com.example.user.dto.request.UpdateShopRequest;
 import com.example.user.dto.response.ShopResponse;
 import com.example.user.service.ShopService;
 import lombok.RequiredArgsConstructor;
@@ -23,4 +24,13 @@ public class ShopController {
         return shopService.createShop(request, publicId);
     }
 
+
+    @PutMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public ShopResponse updateShop(
+            @RequestBody UpdateShopRequest request,
+            @RequestHeader("User-Public-Id") String publicId
+    ) {
+        return shopService.updateShop(request, publicId);
+    }
 }

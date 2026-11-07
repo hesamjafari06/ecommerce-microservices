@@ -1,6 +1,7 @@
 package com.example.user.service;
 
 import com.example.user.dto.request.CreateShopRequest;
+import com.example.user.dto.request.UpdateShopRequest;
 import com.example.user.dto.response.ShopResponse;
 import com.example.user.mapper.ShopMapper;
 import com.example.user.model.ShopEntity;
@@ -32,5 +33,30 @@ public class ShopService {
         shopRepository.save(newShop);
 
         return shopMapper.entityToResponse(newShop);
+    }
+
+    @Transactional
+    public ShopResponse updateShop(UpdateShopRequest request, String publicId) {
+
+        UserEntity owner = userService.findUser(null, null, publicId);
+
+        ShopEntity shop = shopRepository.findByShopAddress(request.getShopAddress())
+                .orElseThrow(() -> new RuntimeException("shop not found"));
+
+        if (!shop.getOwner().equals(owner)) {
+            throw new IllegalArgumentException("this shop is now owned by you");
+        }
+        if (request.getShopAddress() != null) {
+            if (shopRepository.existsByShopAddress(request.getShopAddress())) {
+                throw new IllegalArgumentException("this shopAddress is occupied");
+            } else {
+                shop.setShopAddress(request.getShopAddress());
+            }
+        }
+        if (request.getName() != null) {
+            shop.setName(request.getName());
+        }
+
+        return shopMapper.entityToResponse(shop);
     }
 }
