@@ -36,11 +36,11 @@ public class ShopService {
     }
 
     @Transactional
-    public ShopResponse updateShop(UpdateShopRequest request, String publicId) {
+    public ShopResponse updateShop(UpdateShopRequest request, String publicId, String shopAddress) {
 
         UserEntity owner = userService.findUser(null, null, publicId);
 
-        ShopEntity shop = shopRepository.findByShopAddress(request.getShopAddress())
+        ShopEntity shop = shopRepository.findByShopAddress(shopAddress)
                 .orElseThrow(() -> new RuntimeException("shop not found"));
 
         if (!shop.getOwner().equals(owner)) {

@@ -25,12 +25,13 @@ public class ShopController {
     }
 
 
-    @PutMapping()
+    @PutMapping("/{address}")
     @ResponseStatus(HttpStatus.OK)
     public ShopResponse updateShop(
+            @PathVariable String address,
             @RequestBody UpdateShopRequest request,
             @RequestHeader("User-Public-Id") String publicId
     ) {
-        return shopService.updateShop(request, publicId);
+        return shopService.updateShop(request, publicId, address);
     }
 }
