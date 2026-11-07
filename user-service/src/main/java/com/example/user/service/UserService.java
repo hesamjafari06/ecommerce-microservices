@@ -2,6 +2,7 @@ package com.example.user.service;
 
 import com.example.user.dto.request.LoginUserRequest;
 import com.example.user.dto.request.RegisterUserRequest;
+import com.example.user.dto.request.UpdateUserRequest;
 import com.example.user.dto.response.UserResponse;
 import com.example.user.mapper.UserMapper;
 import com.example.user.model.UserEntity;
@@ -28,11 +29,33 @@ public class UserService {
 
         validateLoginRequest(request);
 
-        UserEntity user = findUser(request);
+        UserEntity user = findUser(request.getPhoneNumber(), request.getEmail(), request.getPublicId());
 
         if (!user.getPassword().equals(request.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
+
+        return userMapper.EntityToResponse(user);
+    }
+
+    @Transactional
+    public UserResponse updateUser(UpdateUserRequest request, String publicId) {
+        UserEntity user = findUser(null, null, publicId);
+
+        if (request.getPublicId() != null) {
+            user.setPublicId(request.getPublicId());
+        }
+        if (request.getEmail() != null) {
+            user.setEmail(request.getEmail());
+        }
+        if (request.getUsername() != null) {
+            user.setUsername(request.getUsername());
+        }
+        return userMapper.EntityToResponse(user);
+    }
+
+    public UserResponse showUserInfo(String publicId) {
+        UserEntity user = findUser(null, null, publicId);
 
         return userMapper.EntityToResponse(user);
     }
@@ -52,23 +75,22 @@ public class UserService {
         }
     }
 
-    private UserEntity findUser(LoginUserRequest request) {
+    private UserEntity findUser(String phoneNumber, String email, String publicId) {
 
-        if (request.getPublicId() != null) {
-            return userRepository.findByPublicId(request.getPublicId())
+        if (publicId != null) {
+            return userRepository.findByPublicId(publicId)
                     .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
-        } else if (request.getPhoneNumber() != null) {
-            return userRepository.findByPhoneNumber(request.getPhoneNumber())
+        } else if (phoneNumber != null) {
+            return userRepository.findByPhoneNumber(phoneNumber)
                     .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
-        } else if (request.getEmail() != null) {
-            return userRepository.findByEmail(request.getEmail())
+        } else if (email != null) {
+            return userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
         } else {
             throw new IllegalArgumentException("Login identifier is required");
         }
     }
-
 }

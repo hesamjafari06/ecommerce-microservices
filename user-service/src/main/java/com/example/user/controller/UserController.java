@@ -2,6 +2,7 @@ package com.example.user.controller;
 
 import com.example.user.dto.request.LoginUserRequest;
 import com.example.user.dto.request.RegisterUserRequest;
+import com.example.user.dto.request.UpdateUserRequest;
 import com.example.user.dto.response.UserResponse;
 import com.example.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,21 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public UserResponse loginUser(@RequestBody LoginUserRequest request) {
         return userService.loginUser(request);
+    }
+
+    @GetMapping("/{publicId}")
+    @ResponseStatus(HttpStatus.FOUND)
+    public UserResponse showInfoUser(@PathVariable String publicId) {
+        return userService.showUserInfo(publicId);
+    }
+
+    @PutMapping
+    @ResponseStatus(HttpStatus.OK)
+    public UserResponse updateUser(
+            @RequestBody UpdateUserRequest request,
+            @RequestHeader("User-Public-Id") String publicId
+    ) {
+        return userService.updateUser(request, publicId);
     }
 
 }
