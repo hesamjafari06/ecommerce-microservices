@@ -1,14 +1,17 @@
 package com.example.product.service;
 
 import com.example.product.dto.request.CreateProductRequest;
+import com.example.product.dto.request.UserShopCheckRequest;
 import com.example.product.dto.response.ProductResponse;
+import com.example.product.mapper.ProductMapper;
 import com.example.product.model.Product;
 import com.example.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 
 @Service
 @RequiredArgsConstructor
@@ -16,29 +19,26 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
+    private final RestClient userServiceRestClient;
 
-    public void createProduct(CreateProductRequest request) {
-        Product product =
-                Product.builder()
-                        .name(request.getName())
-                        .description(request.getDescription())
-                        .price(request.getPrice())
-                        .build();
+    @Transactional
+    public ProductResponse addProduct(CreateProductRequest request, String ownerPublicId) {
 
-        productRepository.save(product);
-        log.info("product {} is saved", product.getId());
-    }
+        UserShopCheckRequest checkRequest = new UserShopCheckRequest(ownerPublicId, request.getShopAddress());
 
-    public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll().stream().map(this::mapToResponse).toList();
-    }
-
-    public ProductResponse mapToResponse(Product product) {
-        return ProductResponse.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .build();
+        boolean isOwned = userServiceRestClient
+                .post()
+                .uri("/api/shop/check")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(checkRequest)
+                .retrieve()
+                .body(Boolean.class);
+        if (isOwned) {
+            Product newProduct = productMapper.createToModel(request, ownerPublicId);
+            productRepository.save(newProduct);
+            return productMapper.ModelToResponse(newProduct);
+        }
+        throw new IllegalArgumentException("this shop is now owned by you");
     }
 }

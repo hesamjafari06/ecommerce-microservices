@@ -2,6 +2,7 @@ package com.example.user.service;
 
 import com.example.user.dto.request.CreateShopRequest;
 import com.example.user.dto.request.UpdateShopRequest;
+import com.example.user.dto.request.UserShopCheckRequest;
 import com.example.user.dto.response.ShopResponse;
 import com.example.user.mapper.ShopMapper;
 import com.example.user.model.ShopEntity;
@@ -79,5 +80,11 @@ public class ShopService {
                 shopRepository.findByShopAddress(address)
                 .orElseThrow(() -> new RuntimeException("shop not found"))
         );
+    }
+
+    public boolean checkOwner(UserShopCheckRequest request) {
+        return shopRepository.findByShopAddress(request.shopAddress())
+                .orElseThrow(() -> new RuntimeException("shop not found"))
+                .getOwner().getPublicId().equals(request.ownerPublicId());
     }
 }

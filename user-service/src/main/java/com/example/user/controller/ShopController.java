@@ -2,6 +2,7 @@ package com.example.user.controller;
 
 import com.example.user.dto.request.CreateShopRequest;
 import com.example.user.dto.request.UpdateShopRequest;
+import com.example.user.dto.request.UserShopCheckRequest;
 import com.example.user.dto.response.ShopResponse;
 import com.example.user.service.ShopService;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,11 @@ public class ShopController {
     @ResponseStatus(HttpStatus.OK)
     public ShopResponse showInfoShop(@PathVariable String address) {
         return shopService.showShopInfo(address);
+    }
+
+    @PostMapping("/check")
+    @ResponseStatus(HttpStatus.OK)
+    public boolean checkShopOwner(@RequestBody UserShopCheckRequest request) {
+        return shopService.checkOwner(request);
     }
 }
