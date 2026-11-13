@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -119,5 +121,12 @@ public class ProductService {
         }
 
         productRepository.delete(product);
+    }
+
+    public List<ProductResponse> getShopProducts(String shopAddress) {
+        return productRepository.findByShopAddress(shopAddress)
+                .stream()
+                .map(productMapper::ModelToResponse)
+                .toList();
     }
 }
