@@ -60,4 +60,10 @@ public class ProductController {
         return productService.getShopProducts(shopAddress);
     }
 
+    @GetMapping({"/stock/{publicId}"})
+    @ResponseStatus(HttpStatus.OK)
+    public boolean isInStock(@PathVariable String publicId) {
+        return productService.isInStock(publicId);
+    }
+
 }

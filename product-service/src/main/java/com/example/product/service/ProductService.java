@@ -129,4 +129,11 @@ public class ProductService {
                 .map(productMapper::ModelToResponse)
                 .toList();
     }
+
+    public boolean isInStock(String publicId) {
+        Product product = productRepository.findByPublicId(publicId)
+                .orElseThrow(() -> new RuntimeException("product not found"));
+
+        return product.getQuantity() > 0;
+    }
 }
