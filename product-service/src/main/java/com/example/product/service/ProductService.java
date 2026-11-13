@@ -143,4 +143,15 @@ public class ProductService {
         log.info("Deleting all products for shopAddress: {} owned by user: {}", shopAddress, userPublicId);
         productRepository.deleteByShopAddress(shopAddress);
     }
+
+    public ProductResponse showInfoProduct(String publicId) {
+        Product product = productRepository.findByPublicId(publicId)
+                .orElseThrow(() -> new RuntimeException("product not found"));
+
+        return productMapper.ModelToResponse(product);
+    }
+
+    public ProductResponse showProductInfo(String publicId) {
+        return showInfoProduct(publicId);
+    }
 }

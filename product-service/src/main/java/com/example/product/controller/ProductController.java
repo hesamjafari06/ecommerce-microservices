@@ -66,4 +66,10 @@ public class ProductController {
         return productService.isInStock(publicId);
     }
 
+    @GetMapping("/{publicId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ProductResponse showInfoProduct(@PathVariable String publicId) {
+        return productService.showInfoProduct(publicId);
+    }
+
 }
