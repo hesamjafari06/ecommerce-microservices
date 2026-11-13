@@ -1,16 +1,23 @@
 package com.example.user.service;
 
+import com.example.user.dto.ProductDto;
 import com.example.user.dto.request.CreateShopRequest;
 import com.example.user.dto.request.UpdateShopRequest;
 import com.example.user.dto.request.UserShopCheckRequest;
+import com.example.user.dto.response.ProductResponse;
+import com.example.user.dto.response.ShopInfoResponse;
 import com.example.user.dto.response.ShopResponse;
 import com.example.user.mapper.ShopMapper;
 import com.example.user.model.ShopEntity;
 import com.example.user.model.UserEntity;
 import com.example.user.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +26,7 @@ public class ShopService {
     private final ShopRepository shopRepository;
     private final ShopMapper shopMapper;
     private final UserService userService;
+    private final RestClient productServiceRestClient;
 
     @Transactional
     public ShopResponse createShop(CreateShopRequest request, String publicId) {
@@ -75,11 +83,21 @@ public class ShopService {
         shopRepository.delete(shop);
     }
 
-    public ShopResponse showShopInfo(String address) {
-        return shopMapper.entityToResponse(
-                shopRepository.findByShopAddress(address)
-                .orElseThrow(() -> new RuntimeException("shop not found"))
-        );
+    public ShopInfoResponse showShopInfo(String address) {
+        ShopEntity shop = shopRepository.findByShopAddress(address)
+                .orElseThrow(() -> new RuntimeException("shop not found"));
+
+        List<ProductResponse> productResponses = productServiceRestClient
+                .get()
+                .uri("/api/product/shop/{shopAddress}", address)
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {});
+
+        List<ProductDto> productList = productResponses == null ? List.of() : productResponses.stream()
+                .map(shopMapper::productResponseToDto)
+                .toList();
+
+        return shopMapper.entityToInfoResponse(shop, productList);
     }
 
     public boolean checkOwner(UserShopCheckRequest request) {
