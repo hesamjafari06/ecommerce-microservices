@@ -12,6 +12,9 @@ import com.example.user.model.ShopEntity;
 import com.example.user.model.UserEntity;
 import com.example.user.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.example.user.config.RabbitMQConfig;
+import com.example.user.dto.event.DeleteShopProductsEvent;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,7 @@ public class ShopService {
     private final ShopMapper shopMapper;
     private final UserService userService;
     private final RestClient productServiceRestClient;
+    private final RabbitTemplate rabbitTemplate;
 
     @Transactional
     public ShopResponse createShop(CreateShopRequest request, String publicId) {
@@ -81,6 +85,9 @@ public class ShopService {
         }
 
         shopRepository.delete(shop);
+
+        DeleteShopProductsEvent event = new DeleteShopProductsEvent(publicId, shopAddress);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.SHOP_EXCHANGE, RabbitMQConfig.SHOP_DELETE_ROUTING_KEY, event);
     }
 
     public ShopInfoResponse showShopInfo(String address) {

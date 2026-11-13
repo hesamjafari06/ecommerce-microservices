@@ -74,11 +74,12 @@ public class ProductService {
         }
 
         String newPublicId = request.getNewPublicId();
-
-        if (productRepository.existsByPublicId(newPublicId)) {
-            throw new IllegalArgumentException("this publicId is occupied");
+        if (newPublicId != null && !newPublicId.isBlank() && !newPublicId.equals(product.getPublicId())) {
+            if (productRepository.existsByPublicId(newPublicId)) {
+                throw new IllegalArgumentException("this publicId is occupied");
+            }
+            product.setPublicId(newPublicId);
         }
-        product.setPublicId(newPublicId);
 
 
         if (request.getNewName() != null && !request.getNewName().isBlank()) {
@@ -135,5 +136,11 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("product not found"));
 
         return product.getQuantity() > 0;
+    }
+
+    @Transactional
+    public void deleteShopProducts(String userPublicId, String shopAddress) {
+        log.info("Deleting all products for shopAddress: {} owned by user: {}", shopAddress, userPublicId);
+        productRepository.deleteByShopAddress(shopAddress);
     }
 }
