@@ -26,7 +26,6 @@
     <modules>
         <module>product-service</module>
         <module>order-service</module>
-        <module>inventory-service</module>
         <module>api-gateway</module>
         <module>user-service</module>
     </modules>
