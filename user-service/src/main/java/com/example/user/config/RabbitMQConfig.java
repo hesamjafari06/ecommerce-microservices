@@ -12,23 +12,23 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String SHOP_EXCHANGE = "shop.exchange";
-    public static final String SHOP_DELETE_QUEUE = "shop.delete.products.queue";
-    public static final String SHOP_DELETE_ROUTING_KEY = "shop.deleted";
+    public static final String Shop_Exchange = "shop.exchange";
+    public static final String Shop_Delete_Queue = "shop.delete.products.queue";
+    public static final String Shop_Delete_Routing_Key = "shop.deleted";
 
     @Bean
     public DirectExchange shopExchange() {
-        return new DirectExchange(SHOP_EXCHANGE);
+        return new DirectExchange(Shop_Exchange);
     }
 
     @Bean
     public Queue shopDeleteQueue() {
-        return new Queue(SHOP_DELETE_QUEUE, true);
+        return new Queue(Shop_Delete_Queue, true);
     }
 
     @Bean
     public Binding shopDeleteBinding(Queue shopDeleteQueue, DirectExchange shopExchange) {
-        return BindingBuilder.bind(shopDeleteQueue).to(shopExchange).with(SHOP_DELETE_ROUTING_KEY);
+        return BindingBuilder.bind(shopDeleteQueue).to(shopExchange).with(Shop_Delete_Routing_Key);
     }
 
     @Bean

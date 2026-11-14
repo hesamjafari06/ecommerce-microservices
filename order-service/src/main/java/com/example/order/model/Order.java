@@ -1,25 +1,30 @@
 package com.example.order.model;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "orders")
+@Document(collection = "orders")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Order {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String orderNumber;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<OrderLineItem> orderLineItemList;
+    @Id
+    private String id;
+    private String publicId;
+    private String ownerPublicId;
+    @Builder.Default
+    private List<OrderItem> orderItemList = new ArrayList<>();
+    @Builder.Default
+    private BigDecimal totalPrice = BigDecimal.ZERO;
+    private LocalDateTime timestamp;
 }

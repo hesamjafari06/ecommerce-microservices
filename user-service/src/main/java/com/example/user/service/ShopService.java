@@ -87,7 +87,7 @@ public class ShopService {
         shopRepository.delete(shop);
 
         DeleteShopProductsEvent event = new DeleteShopProductsEvent(publicId, shopAddress);
-        rabbitTemplate.convertAndSend(RabbitMQConfig.SHOP_EXCHANGE, RabbitMQConfig.SHOP_DELETE_ROUTING_KEY, event);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.Shop_Exchange, RabbitMQConfig.Shop_Delete_Routing_Key, event);
     }
 
     public ShopInfoResponse showShopInfo(String address) {

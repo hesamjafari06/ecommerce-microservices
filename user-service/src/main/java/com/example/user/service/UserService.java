@@ -11,12 +11,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.web.client.RestClient;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final RestClient orderServiceRestClient;
 
     @Transactional
     public UserResponse createUser(RegisterUserRequest request) {
@@ -33,6 +36,13 @@ public class UserService {
 
         UserEntity newUser = userMapper.registerToEntity(request);
         userRepository.save(newUser);
+
+        orderServiceRestClient.post()
+                .uri("/api/order/cart")
+                .header("User-Public-Id", newUser.getPublicId())
+                .retrieve()
+                .toBodilessEntity();
+
         return userMapper.EntityToResponse(newUser);
     }
 
